@@ -1,0 +1,62 @@
+{
+  "kind": "collectionType",
+  "collectionName": "formations",
+  "info": {
+    "singularName": "formation",
+    "pluralName": "formations",
+    "displayName": "formations"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "slug": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "descriptions": {
+      "type": "text"
+    },
+    "duration": {
+      "type": "string"
+    },
+    "images": {
+      "type": "media",
+      "multiple": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "imageAlt": {
+      "type": "string"
+    },
+    "registrations": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::registration.registration"
+    },
+    "isOpen": {
+      "type": "boolean"
+    },
+    "milestones": {
+      "type": "json"
+    },
+    "courses": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::course.course"
+    },
+    "studentCapacity": {
+      "type": "integer"
+    },
+    "registeredStudents": {
+      "type": "integer"
+    }
+  }
+}

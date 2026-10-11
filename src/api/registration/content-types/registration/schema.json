@@ -1,0 +1,53 @@
+{
+  "kind": "collectionType",
+  "collectionName": "registrations",
+  "info": {
+    "singularName": "registration",
+    "pluralName": "registrations",
+    "displayName": "registrations"
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "nom": {
+      "type": "string"
+    },
+    "prenom": {
+      "type": "string"
+    },
+    "sexe": {
+      "type": "string"
+    },
+    "date_naissance": {
+      "type": "date"
+    },
+    "whatsapp": {
+      "type": "string"
+    },
+    "adresse": {
+      "type": "string"
+    },
+    "departement": {
+      "type": "string"
+    },
+    "commune": {
+      "type": "string"
+    },
+    "niveau_etude": {
+      "type": "string"
+    },
+    "consentement": {
+      "type": "boolean"
+    },
+    "source_connaissance": {
+      "type": "string"
+    },
+    "formations": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::formation.formation"
+    }
+  }
+}
