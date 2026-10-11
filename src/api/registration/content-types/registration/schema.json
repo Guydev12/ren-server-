@@ -44,7 +44,7 @@
     "source_connaissance": {
       "type": "string"
     },
-    "formation": {
+    "formations": {
       "type": "relation",
       "relation": "manyToOne",
       "target": "api::formation.formation",

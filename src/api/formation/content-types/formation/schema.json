@@ -40,7 +40,7 @@
       "type": "relation",
       "relation": "oneToMany",
       "target": "api::registration.registration",
-      "mappedBy": "formation"
+      "mappedBy": "formations"
     },
     "isOpen": {
       "type": "boolean"

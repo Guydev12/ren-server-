@@ -455,7 +455,6 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
   };
   attributes: {
     category: Schema.Attribute.String;
-    content: Schema.Attribute.Blocks;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -469,11 +468,12 @@ export interface ApiArticleArticle extends Struct.CollectionTypeSchema {
     > &
       Schema.Attribute.Private;
     publishedAt: Schema.Attribute.DateTime;
+    sections: Schema.Attribute.JSON;
     slug: Schema.Attribute.String;
-    title: Schema.Attribute.String;
     updatedAt: Schema.Attribute.DateTime;
     updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
+    title: Schema.Attribute.String;
   };
 }
 
@@ -570,7 +570,7 @@ export interface ApiRegistrationRegistration
     date_naissance: Schema.Attribute.Date;
     departement: Schema.Attribute.String;
     formations: Schema.Attribute.Relation<
-      'oneToMany',
+      'manyToOne',
       'api::formation.formation'
     >;
     locale: Schema.Attribute.String & Schema.Attribute.Private;

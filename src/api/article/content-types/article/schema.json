@@ -33,11 +33,11 @@
         "audios"
       ]
     },
+    "sections": {
+      "type": "json"
+    },
     "imageAlt": {
       "type": "string"
-    },
-    "content": {
-      "type": "blocks"
     }
   }
 }

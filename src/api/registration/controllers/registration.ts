@@ -11,7 +11,7 @@ export default factories.createCoreController('api::registration.registration', 
 		const data = ctx.request.body?.data;
 		if (!data || typeof data !== 'object') return ctx.badRequest('Les informations d’inscription sont invalides.');
 
-		const relation = data.formation ?? data.formations;
+		const relation = data.formations ?? data.formation;
 		const connectValue = Array.isArray(relation?.connect) ? relation.connect : relation?.connect ? [relation.connect] : undefined;
 		const reference = Array.isArray(relation) ? relation[0] : connectValue?.[0] ?? relation;
 		const identifier = typeof reference === 'object' && reference !== null
@@ -23,32 +23,45 @@ export default factories.createCoreController('api::registration.registration', 
 		}
 		const formationEntry = await strapi.db.query('api::formation.formation').findOne({
 			where: Number.isInteger(numericId) && numericId > 0 ? { id: numericId } : { documentId: String(identifier) },
-			select: ['id'],
+			select: ['id', 'documentId'],
 		});
 		if (!formationEntry) return ctx.notFound('Cette formation n’existe plus.');
 		const formationId = formationEntry.id;
 
-		return strapi.db.transaction(async ({ trx }) => {
+		const result = await strapi.db.transaction(async ({ trx }) => {
 			const formation = await trx('formations').where({ id: formationId }).forUpdate().first();
 			if (!formation) return ctx.notFound('Cette formation n’existe plus.');
 
 			const isOpen = Boolean(formation.is_open ?? formation.isOpen);
 			const capacity = Number(formation.student_capacity ?? formation.studentCapacity ?? 0);
-			const registeredStudents = Number(formation.registered_students ?? formation.registeredStudents ?? 0);
+			const registeredStudents = await strapi.db.query('api::registration.registration').count({
+				where: { formations: { id: formationId } },
+			});
 			if (!isOpen || (capacity > 0 && registeredStudents >= capacity)) {
-				return ctx.throw(409, fullMessage);
+				const update: Record<string, number | boolean> = { registered_students: registeredStudents };
+				if (capacity > 0 && registeredStudents >= capacity) update['is_open'] = false;
+				await trx('formations').where({ id: formationId }).update(update);
+				return { conflict: true as const };
 			}
 
-			const nextCount = registeredStudents + 1;
-			const update: Record<string, number | boolean> = { registered_students: nextCount };
-			if (capacity > 0 && nextCount >= capacity) update['is_open'] = false;
-			await trx('formations').where({ id: formationId }).update(update);
-
-			data.formation = { connect: [formationId] };
-			delete data.formations;
+			data.formations = { connect: [formationEntry.documentId] };
+			delete data.formation;
 			ctx.request.body = { ...(ctx.request.body ?? {}), data };
-			return super.create(ctx);
+			const response = await super.create(ctx);
+			const actualCount = await strapi.db.query('api::registration.registration').count({
+				where: { formations: { id: formationId } },
+			});
+			const update: Record<string, number | boolean> = { registered_students: actualCount };
+			if (capacity > 0 && actualCount >= capacity) update['is_open'] = false;
+			await trx('formations').where({ id: formationId }).update(update);
+			return { conflict: false as const, response };
 		});
+		if ('conflict' in result && result.conflict) {
+			ctx.status = 409;
+			ctx.body = { data: null, error: { status: 409, name: 'ConflictError', message: fullMessage } };
+			return ctx.body;
+		}
+		return 'response' in result ? result.response : result;
 	},
 
 	async find(ctx) {
