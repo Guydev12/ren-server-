@@ -44,10 +44,11 @@
     "source_connaissance": {
       "type": "string"
     },
-    "formations": {
+    "formation": {
       "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::formation.formation"
+      "relation": "manyToOne",
+      "target": "api::formation.formation",
+      "inversedBy": "registrations"
     }
   }
 }
